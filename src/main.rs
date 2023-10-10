@@ -34,7 +34,7 @@ struct Pink{
 }
 
 struct Model {
-    //stream: audio::Stream<Resonator>,
+    stream: audio::Stream<Pink>,
 }
 
 fn update_noise(noise:&mut Noise){
@@ -76,7 +76,7 @@ fn model(app: &App) -> Model {
         .unwrap();
 
     stream.play().unwrap();
-    Model{}
+    Model{stream}
 }
 
 fn audio(pink:&mut Pink, buffer: &mut Buffer){
