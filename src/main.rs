@@ -1,7 +1,7 @@
 use nannou::prelude::*;
 use nannou_audio as audio;
 use nannou_audio::Buffer;
-use std::f32::consts::PI;
+use rand::random;
 
 fn main() {
     nannou::app(model)
@@ -18,8 +18,28 @@ struct Resonator
     y: [f32;2],
 }
 
+#[derive(Copy, Clone)]
+struct Noise{
+    previous:f32,
+    value:f32,
+}
+
+struct Pink{
+    noise: [Noise; 15], // updated based on trailing zeros
+    white: Noise, // Updated every iteration
+    pink: f32, // Actual noise
+    
+    pink_norm: f32,
+    counter: u32,
+}
+
 struct Model {
     //stream: audio::Stream<Resonator>,
+}
+
+fn update_noise(noise:&mut Noise){
+    noise.previous = noise.value;
+    noise.value = (random::<f32>() * 2.0) - 1.0;
 }
 
 fn model(app: &App) -> Model {
@@ -32,29 +52,44 @@ fn model(app: &App) -> Model {
         .build()
         .unwrap();
 
-    let omega:f32 = (2.0 * PI * 500.0) / 44100.0;
-    let amplitude = 0.9;
-    let b0:f32 =  amplitude * omega.sin();
-
-    let res = Resonator{
-        a1: -2.0 * omega.cos(),
-        a2: 1.0,
-        y: [b0, 0.0],
+    let mut pink = Pink{
+        noise:[Noise{previous:0.0, value:0.0}; 15],
+        white: Noise{previous:0.0, value:0.0},
+        pink: 0.0,
+        pink_norm: 0.0,
+        counter: 1,
     };
+    
+    update_noise(&mut pink.white);
+    let generators = 15;
+    for i in 0..generators{
+        update_noise(&mut pink.noise[i]);
+        pink.pink += pink.noise[i].value;
+    }
+    pink.pink += pink.white.value;
 
     let audio_host = audio::Host::new();
     let stream = audio_host
-        .new_output_stream(res)
+        .new_output_stream(pink)
         .render(audio)
         .build()
         .unwrap();
 
     stream.play().unwrap();
-
     Model{}
 }
 
-fn audio(res:&mut Resonator, buffer: &mut Buffer)
+fn audio(pink:&mut Pink, buffer: &mut Buffer){
+    for frame in buffer.frames_mut(){
+        update_noise(&mut pink.white);
+        for channel in frame{
+            *channel = (random::<f32>() * 2.0) - 1.0;
+        } 
+    }
+} 
+
+#[allow(dead_code)]
+fn aaudio(res:&mut Resonator, buffer: &mut Buffer)
 {
     for frame in buffer.frames_mut(){
         let y = -(res.a1 * res.y[0]) - (res.a2 * res.y[1]);
