@@ -31,6 +31,9 @@ struct Pink{
     
     pink_norm: f32,
     counter: u32,
+
+    generators: u32,
+    rollover: u32,
 }
 
 struct Model {
@@ -58,8 +61,12 @@ fn model(app: &App) -> Model {
         pink: 0.0,
         pink_norm: 0.0,
         counter: 1,
+        generators: 15,
+        rollover: 0,
     };
     
+    pink.rollover = 2u32.pow(pink.generators - 1);
+
     update_noise(&mut pink.white);
     let generators = 15;
     for i in 0..generators{
@@ -72,6 +79,7 @@ fn model(app: &App) -> Model {
     let stream = audio_host
         .new_output_stream(pink)
         .render(audio)
+        .channels(1)
         .build()
         .unwrap();
 
@@ -79,11 +87,33 @@ fn model(app: &App) -> Model {
     Model{_stream:stream}
 }
 
+fn pink_update(pink:&mut Pink) -> f32{
+
+    let index = pink.counter.trailing_zeros();
+
+    update_noise(&mut pink.white);
+    update_noise(&mut pink.noise[index as usize]);
+
+    pink.pink = pink.pink - pink.white.previous;
+    pink.pink = pink.pink + pink.white.value;
+    
+    pink.pink = pink.pink - pink.noise[index as usize].previous;
+    pink.pink = pink.pink + pink.noise[index as usize].value;
+
+    pink.pink_norm = pink.pink / (pink.generators as f32 + 1.0);
+
+    pink.counter = pink.counter & (pink.rollover - 1); 
+    pink.counter = pink.counter + 1;
+
+    pink.pink_norm
+}
+
 fn audio(pink:&mut Pink, buffer: &mut Buffer){
     for frame in buffer.frames_mut(){
-        update_noise(&mut pink.white);
+        let pink = pink_update(pink);
         for channel in frame{
-            *channel = (random::<f32>() * 2.0) - 1.0;
+            *channel = pink;
+            //*channel = (random::<f32>() * 2.0) - 1.0;
         } 
     }
 } 
