@@ -118,20 +118,6 @@ fn audio(pink:&mut Pink, buffer: &mut Buffer){
     }
 } 
 
-#[allow(dead_code)]
-fn aaudio(res:&mut Resonator, buffer: &mut Buffer)
-{
-    for frame in buffer.frames_mut(){
-        let y = -(res.a1 * res.y[0]) - (res.a2 * res.y[1]);
-        for channel in frame{
-            *channel = y;
-        }
-        
-        res.y[1] = res.y[0];
-        res.y[0] = y;
-    }
-}
-
 fn update(_app:&App, _model: &mut Model, _update: Update) {}
 
 fn view( _app: &App, _model: &Model, _frame: Frame) {}
