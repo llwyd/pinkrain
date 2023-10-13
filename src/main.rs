@@ -10,14 +10,6 @@ fn main() {
         .run();
 }
 
-
-struct Resonator
-{
-    a1: f32,
-    a2: f32,
-    y: [f32;2],
-}
-
 #[derive(Copy, Clone)]
 struct Noise{
     previous:f32,
