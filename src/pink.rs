@@ -46,11 +46,10 @@ impl Pink{
 
         pink
     }
-    pub fn init(&mut self){
-        
 
-    }
-
+    /* Generates a new sample using the Voss-McCartney algorithm
+     * https://www.firstpr.com.au/dsp/pink-noise/
+     */
     pub fn update(&mut self) -> f32{
 
         let index = self.counter.trailing_zeros();
