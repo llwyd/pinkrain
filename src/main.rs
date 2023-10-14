@@ -28,8 +28,13 @@ struct RainDrop{
     speed: f32,
 }
 
+struct StereoPink{
+    l: Pink,
+    r: Pink,
+}
+
 struct Model {
-    _stream: audio::Stream<Pink>,
+    _stream: audio::Stream<StereoPink>,
     raindrop: Vec<RainDrop>,
 }
 
@@ -37,15 +42,18 @@ struct Model {
 fn model(app: &App) -> Model {
     app.new_window()
         .size(640,480)
-        //.min_size(640,480)
-        //.max_size(640,480)
         .decorations(false)
         .resizable(true)
         .resized(resized)
         .build()
         .unwrap();
 
-    let pink = Pink::new();
+    
+    let pink = StereoPink{
+        l: Pink::new(),
+        r: Pink::new(),
+    };
+    
     let audio_host = audio::Host::new();
     let stream = audio_host
         .new_output_stream(pink)
@@ -83,12 +91,13 @@ fn model(app: &App) -> Model {
     model
 }
 
-fn audio(pink:&mut Pink, buffer: &mut Buffer){
+fn audio(pink:&mut StereoPink, buffer: &mut Buffer){
     for frame in buffer.frames_mut(){
-        let pink = pink.update();
-        for channel in frame{
-            *channel = pink;
-        } 
+        let pink_l = pink.l.update();
+        let pink_r = pink.r.update();
+
+        frame[0] = pink_l;
+        frame[1] = pink_r;
     }
 } 
 
