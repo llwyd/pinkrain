@@ -72,7 +72,15 @@ impl Pink{
 #[cfg(test)]
 mod tests {
     use super::*;
+    
+    #[test]
+    fn noise_update(){
+        let mut noise = Noise{previous:0.0, value:0.0};
 
+        assert_eq!(noise.value, 0.0);
+        assert_eq!(noise.previous, 0.0);
+    }
+    
     #[test]
     fn trailing_zeros() {
         let mut p = Pink::new();
