@@ -41,7 +41,7 @@ struct Model {
 
 
 fn model(app: &App) -> Model {
-    app.new_window()
+    let window = app.new_window()
         .size(640,480)
         .decorations(false)
         .resizable(true)
@@ -49,6 +49,9 @@ fn model(app: &App) -> Model {
         .build()
         .unwrap();
 
+    app.window(window)
+        .expect("Failed to get window")
+        .set_cursor_visible(false); 
     
     let pink = StereoPink{
         l: Pink::new(),
