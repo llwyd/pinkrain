@@ -33,14 +33,22 @@ impl Pink{
     
 
     fn get_noise_index(&self) -> u32{
+        assert!(self.counter > 0);
         self.counter.trailing_zeros()
     }
     /* Generates a new sample using the Voss-McCartney algorithm
      * https://www.firstpr.com.au/dsp/pink-noise/
      */
+
+    fn increment_counter(&mut self){
+        self.counter = self.counter & (self.rollover - 1); 
+        self.counter = self.counter + 1;
+    }
+
     pub fn update(&mut self) -> f32{
 
         let index = self.get_noise_index();
+        assert!( index < self.generators );
 
         self.white.update();
         self.noise[index as usize].update();
@@ -51,9 +59,7 @@ impl Pink{
         self.pink = self.pink - self.noise[index as usize].previous();
         self.pink = self.pink + self.noise[index as usize].value();
 
-
-        self.counter = self.counter & (self.rollover - 1); 
-        self.counter = self.counter + 1;
+        self.increment_counter();
 
         self.pink / (self.generators as f32 + 1.0)
     }
@@ -63,6 +69,31 @@ impl Pink{
 mod tests {
     use super::*;    
     
+    #[test]
+    fn increment_counter() {
+        let mut p = Pink::new();
+        assert_eq!(p.counter, 1);
+
+        p.increment_counter();
+        assert_eq!(p.counter, 2);
+        
+        p.increment_counter();
+        assert_eq!(p.counter, 3);
+    }
+    
+    #[test]
+    fn increment_counter_rollover() {
+        let mut p = Pink::new();
+        assert_eq!(p.counter, 1);
+
+        p.set_counter(p.rollover - 1);
+        p.increment_counter();
+        assert_eq!(p.counter, p.rollover);
+        
+        p.increment_counter();
+        assert_eq!(p.counter, 1);
+    }
+
     #[test]
     fn trailing_zeros() {
         let mut p = Pink::new();
