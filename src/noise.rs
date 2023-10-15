@@ -27,3 +27,46 @@ impl Noise{
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;    
+    
+    #[test]
+    fn init() {
+        let n = Noise::new();
+
+        assert_eq!(n.previous(), 0.0);
+        assert_eq!(n.value(), 0.0);
+    }
+    
+    #[test]
+    fn update() {
+        let mut n = Noise::new();
+
+        assert_eq!(n.previous(), 0.0);
+        assert_eq!(n.value(), 0.0);
+
+        n.update();
+        
+        assert_eq!(n.previous(), 0.0);
+        assert_ne!(n.value(), 0.0);
+    }
+    
+    #[test]
+    fn update_twice() {
+        let mut n = Noise::new();
+
+        assert_eq!(n.previous(), 0.0);
+        assert_eq!(n.value(), 0.0);
+
+        n.update();
+        
+        assert_eq!(n.previous(), 0.0);
+        assert_ne!(n.value(), 0.0);
+
+        let prev = n.value();
+        n.update();
+        assert_eq!(n.previous(), prev);
+        assert_ne!(n.value(), 0.0);
+    }
+}
