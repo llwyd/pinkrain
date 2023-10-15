@@ -4,6 +4,7 @@ use nannou_audio::Buffer;
 use rand::Rng;
 
 mod pink;
+mod noise;
 pub use crate::pink::Pink;
 
 

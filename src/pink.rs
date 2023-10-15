@@ -1,10 +1,4 @@
-use rand::random;
-
-#[derive(Copy, Clone)]
-pub struct Noise{
-    previous:f32,
-    value:f32,
-}
+pub use crate::noise::Noise;
 
 pub struct Pink{
     noise: [Noise; 15], // updated based on trailing zeros
@@ -22,8 +16,8 @@ impl Pink{
     
     pub fn new() -> Pink{
         Pink{
-            noise:[Noise{previous:0.0, value:0.0}; Self::GENERATORS as usize],
-            white: Noise{previous:0.0, value:0.0},
+            noise:[Noise::new(); Self::GENERATORS as usize],
+            white: Noise::new(),
             pink: 0.0,
             counter: 1,
             generators: Self::GENERATORS,
@@ -37,10 +31,6 @@ impl Pink{
         self.counter = new_counter;
     }
     
-    fn update_noise(noise:&mut Noise){
-        noise.previous = noise.value;
-        noise.value = (random::<f32>() * 2.0) - 1.0;
-    }
 
     fn get_noise_index(&self) -> u32{
         self.counter.trailing_zeros()
@@ -52,14 +42,14 @@ impl Pink{
 
         let index = self.get_noise_index();
 
-        Self::update_noise(&mut self.white);
-        Self::update_noise(&mut self.noise[index as usize]);
+        self.white.update();
+        self.noise[index as usize].update();
 
-        self.pink = self.pink - self.white.previous;
-        self.pink = self.pink + self.white.value;
+        self.pink = self.pink - self.white.previous();
+        self.pink = self.pink + self.white.value();
         
-        self.pink = self.pink - self.noise[index as usize].previous;
-        self.pink = self.pink + self.noise[index as usize].value;
+        self.pink = self.pink - self.noise[index as usize].previous();
+        self.pink = self.pink + self.noise[index as usize].value();
 
 
         self.counter = self.counter & (self.rollover - 1); 
@@ -71,15 +61,7 @@ impl Pink{
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    
-    #[test]
-    fn noise_update(){
-        let mut noise = Noise{previous:0.0, value:0.0};
-
-        assert_eq!(noise.value, 0.0);
-        assert_eq!(noise.previous, 0.0);
-    }
+    use super::*;    
     
     #[test]
     fn trailing_zeros() {
