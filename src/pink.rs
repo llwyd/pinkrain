@@ -45,17 +45,17 @@ impl Pink{
      */
     pub fn update(&mut self) -> f32{
 
-        let index = self.get_noise_index();
-        assert!( index < self.generators );
+        let index = self.get_noise_index() as usize;
+        assert!( index < self.generators as usize );
 
         self.white.update();
-        self.noise[index as usize].update();
+        self.noise[index].update();
 
         self.pink = self.pink - self.white.previous();
         self.pink = self.pink + self.white.value();
         
-        self.pink = self.pink - self.noise[index as usize].previous();
-        self.pink = self.pink + self.noise[index as usize].value();
+        self.pink = self.pink - self.noise[index].previous();
+        self.pink = self.pink + self.noise[index].value();
 
         self.increment_counter();
 
