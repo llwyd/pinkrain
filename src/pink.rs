@@ -23,28 +23,26 @@ impl Pink{
             generators: Self::GENERATORS,
             rollover: 2u32.pow(Self::GENERATORS - 1),
         }
-    }
-
-    #[allow(dead_code)] 
-    fn set_counter(&mut self, new_counter:u32){
-        assert!(new_counter <= self.rollover);
-        self.counter = new_counter;
-    }
-    
+    } 
 
     fn get_noise_index(&self) -> u32{
         assert!(self.counter > 0);
+        assert!(self.counter <= self.rollover);
+        
         self.counter.trailing_zeros()
     }
-    /* Generates a new sample using the Voss-McCartney algorithm
-     * https://www.firstpr.com.au/dsp/pink-noise/
-     */
 
     fn increment_counter(&mut self){
+        assert!(self.counter > 0);
+        assert!(self.counter <= self.rollover);
+        
         self.counter = self.counter & (self.rollover - 1); 
         self.counter = self.counter + 1;
     }
 
+    /* Generates a new sample using the Voss-McCartney algorithm
+     * https://www.firstpr.com.au/dsp/pink-noise/
+     */
     pub fn update(&mut self) -> f32{
 
         let index = self.get_noise_index();
@@ -70,6 +68,12 @@ mod tests {
     use super::*;    
     
     #[test]
+    fn index_distribution() {
+        let mut p = Pink::new();
+        p.update();
+    }
+    
+    #[test]
     fn increment_counter() {
         let mut p = Pink::new();
         assert_eq!(p.counter, 1);
@@ -86,7 +90,7 @@ mod tests {
         let mut p = Pink::new();
         assert_eq!(p.counter, 1);
 
-        p.set_counter(p.rollover - 1);
+        p.counter = p.rollover - 1;
         p.increment_counter();
         assert_eq!(p.counter, p.rollover);
         
@@ -102,49 +106,49 @@ mod tests {
         assert!(p.counter == 1);
         assert!(p.get_noise_index() == 0);
 
-        p.set_counter(0b1u32);
+        p.counter = 0b1u32;
         assert!(p.get_noise_index() == 0);
         
-        p.set_counter(0b10u32);
+        p.counter =0b10u32;
         assert!(p.get_noise_index() == 1);
 
-        p.set_counter(0b100u32);
+        p.counter =0b100u32;
         assert!(p.get_noise_index() == 2);
         
-        p.set_counter(0b1000u32);
+        p.counter =0b1000u32;
         assert!(p.get_noise_index() == 3);
 
-        p.set_counter(0b10000u32);
+        p.counter =0b10000u32;
         assert!(p.get_noise_index() == 4);
 
-        p.set_counter(0b100000u32);
+        p.counter =0b100000u32;
         assert!(p.get_noise_index() == 5);
 
-        p.set_counter(0b1000000u32);
+        p.counter =0b1000000u32;
         assert!(p.get_noise_index() == 6);
 
-        p.set_counter(0b10000000u32);
+        p.counter =0b10000000u32;
         assert!(p.get_noise_index() == 7);
 
-        p.set_counter(0b100000000u32);
+        p.counter =0b100000000u32;
         assert!(p.get_noise_index() == 8);
 
-        p.set_counter(0b1000000000u32);
+        p.counter =0b1000000000u32;
         assert!(p.get_noise_index() == 9);
 
-        p.set_counter(0b10000000000u32);
+        p.counter =0b10000000000u32;
         assert!(p.get_noise_index() == 10);
 
-        p.set_counter(0b100000000000u32);
+        p.counter =0b100000000000u32;
         assert!(p.get_noise_index() == 11);
 
-        p.set_counter(0b1000000000000u32);
+        p.counter = 0b1000000000000u32;
         assert!(p.get_noise_index() == 12);
 
-        p.set_counter(0b10000000000000u32);
+        p.counter = 0b10000000000000u32;
         assert!(p.get_noise_index() == 13);
 
-        p.set_counter(0b100000000000000u32);
+        p.counter = 0b100000000000000u32;
         assert!(p.get_noise_index() == 14);
     }
 }
