@@ -1,7 +1,9 @@
 pub use crate::noise::Noise;
+    
+const GENERATORS: usize = 15;
 
 pub struct Pink{
-    noise: [Noise; 15], // updated based on trailing zeros
+    noise: [Noise; GENERATORS], // updated based on trailing zeros
     white: Noise, // Updated every iteration
     pink: f32, // Actual noise
     
@@ -12,7 +14,7 @@ pub struct Pink{
 }
 
 impl Pink{
-    const GENERATORS: u32 = 15;
+    const GENERATORS: u32 = GENERATORS as u32;
     
     pub fn new() -> Pink{
         Pink{
