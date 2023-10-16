@@ -70,7 +70,19 @@ mod tests {
     #[test]
     fn index_distribution() {
         let mut p = Pink::new();
-        p.update();
+        let mut count: [u32; Pink::GENERATORS as usize] = [0; Pink::GENERATORS as usize];
+
+        for _i in 0..p.rollover{
+            let index = p.get_noise_index();
+            count[index as usize] = count[index as usize] + 1;
+            p.update();
+        }
+        
+        for i in 0..Pink::GENERATORS - 1{
+            assert_eq!(count[i as usize], p.rollover >> (i + 1));
+        }
+        
+        assert_eq!(count[(Pink::GENERATORS - 1) as usize], 1);
     }
     
     #[test]
