@@ -86,6 +86,24 @@ mod tests {
         }
 
     }
+    
+    #[test]
+    fn update() {
+        let mut p = Pink::new();
+        assert_eq!(p.counter, 1);
+        assert_eq!(p.generators, Pink::GENERATORS);
+        assert_eq!(p.pink, 0.0);
+        assert_eq!(p.rollover,16384);
+        assert_eq!(p.white.value(), 0.0);
+        assert_eq!(p.white.previous(), 0.0);
+       
+        p.update();
+        assert_ne!(p.pink, 0.0);
+        assert_ne!(p.white.value(), 0.0);
+        assert_eq!(p.white.previous(), 0.0);
+        assert_ne!(p.noise[0].value(), 0.0);
+        assert_eq!(p.noise[0].previous(), 0.0);
+    }
 
     #[test]
     fn index_distribution() {
