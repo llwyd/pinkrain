@@ -1,7 +1,9 @@
 pub use crate::noise::Noise;
+    
+const GENERATORS: usize = 15;
 
 pub struct Pink{
-    noise: [Noise; 15], // updated based on trailing zeros
+    noise: [Noise; GENERATORS], // updated based on trailing zeros
     white: Noise, // Updated every iteration
     pink: f32, // Actual noise
     
@@ -12,7 +14,7 @@ pub struct Pink{
 }
 
 impl Pink{
-    const GENERATORS: u32 = 15;
+    const GENERATORS: u32 = GENERATORS as u32;
     
     pub fn new() -> Pink{
         Pink{
@@ -68,9 +70,57 @@ mod tests {
     use super::*;    
     
     #[test]
+    fn initialisation() {
+        let p = Pink::new();
+        
+        assert_eq!(p.counter, 1);
+        assert_eq!(p.generators, Pink::GENERATORS);
+        assert_eq!(p.pink, 0.0);
+        assert_eq!(p.rollover,16384);
+        assert_eq!(p.white.value(), 0.0);
+        assert_eq!(p.white.previous(), 0.0);
+
+        for i in 0..Pink::GENERATORS{
+            assert_eq!(p.noise[i as usize].value(), 0.0);
+            assert_eq!(p.noise[i as usize].previous(), 0.0);
+        }
+
+    }
+    
+    #[test]
+    fn update() {
+        let mut p = Pink::new();
+        assert_eq!(p.counter, 1);
+        assert_eq!(p.generators, Pink::GENERATORS);
+        assert_eq!(p.pink, 0.0);
+        assert_eq!(p.rollover,16384);
+        assert_eq!(p.white.value(), 0.0);
+        assert_eq!(p.white.previous(), 0.0);
+       
+        p.update();
+        assert_ne!(p.pink, 0.0);
+        assert_ne!(p.white.value(), 0.0);
+        assert_eq!(p.white.previous(), 0.0);
+        assert_ne!(p.noise[0].value(), 0.0);
+        assert_eq!(p.noise[0].previous(), 0.0);
+    }
+
+    #[test]
     fn index_distribution() {
         let mut p = Pink::new();
-        p.update();
+        let mut count: [u32; Pink::GENERATORS as usize] = [0; Pink::GENERATORS as usize];
+
+        for _i in 0..p.rollover{
+            let index = p.get_noise_index();
+            count[index as usize] = count[index as usize] + 1;
+            p.update();
+        }
+        
+        for i in 0..Pink::GENERATORS - 1{
+            assert_eq!(count[i as usize], p.rollover >> (i + 1));
+        }
+        
+        assert_eq!(count[(Pink::GENERATORS - 1) as usize], 1);
     }
     
     #[test]
