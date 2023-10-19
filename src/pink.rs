@@ -70,6 +70,24 @@ mod tests {
     use super::*;    
     
     #[test]
+    fn initialisation() {
+        let p = Pink::new();
+        
+        assert_eq!(p.counter, 1);
+        assert_eq!(p.generators, Pink::GENERATORS);
+        assert_eq!(p.pink, 0.0);
+        assert_eq!(p.rollover,16384);
+        assert_eq!(p.white.value(), 0.0);
+        assert_eq!(p.white.previous(), 0.0);
+
+        for i in 0..Pink::GENERATORS{
+            assert_eq!(p.noise[i as usize].value(), 0.0);
+            assert_eq!(p.noise[i as usize].previous(), 0.0);
+        }
+
+    }
+
+    #[test]
     fn index_distribution() {
         let mut p = Pink::new();
         let mut count: [u32; Pink::GENERATORS as usize] = [0; Pink::GENERATORS as usize];
