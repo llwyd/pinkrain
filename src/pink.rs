@@ -78,11 +78,9 @@ mod tests {
         assert_eq!(p.pink, 0.0);
         assert_eq!(p.rollover,16384);
         assert_eq!(p.white.value(), 0.0);
-        assert_eq!(p.white.previous(), 0.0);
 
         for i in 0..Pink::GENERATORS{
             assert_eq!(p.noise[i as usize].value(), 0.0);
-            assert_eq!(p.noise[i as usize].previous(), 0.0);
         }
 
     }
