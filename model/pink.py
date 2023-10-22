@@ -133,17 +133,35 @@ print(f'\nGradient Analysis')
 print(f' Pink Slope: {X_slope:.2f}')
 print(f'Ideal Slope: {ideal_slope:.2f}')
 
-
 plt.figure(1)
 plt.semilogx( Xf, Xdb )
 plt.semilogx( Xf, Zdb )
 plt.semilogx( ideal_f, ideal_db )
 plt.legend(['Single iteration', f'Average of {num_tests} iterations', 'Ideal 1/f'])
+
 plt.xlim( 1, int(fs / 2 ) )
-
 plt.grid(which='both')
-
 plt.title('Pink Noise Model (Voss-McCartney)')
+plt.ylabel('Magnitude (dB)')
+plt.xlabel('Frequency (Hz)')
+
+noise = NoiseGenerator()
+n = np.zeros(num_samples)
+for i in range(num_samples):
+    noise.Update()
+    n[i] = noise.value
+    
+N, Nf, Ndb = fft(n, fs, len(n),norm='ortho' )
+x, indices = voss(num_samples,generators)
+X, Xf, Xdb = fft(x, fs, len(x),norm='ortho' )
+
+plt.figure(2)
+plt.semilogx( Nf, Ndb )
+plt.semilogx( Xf, Xdb )
+plt.legend(['White noise','Pink Noise'])
+plt.xlim( 1, int(fs / 2 ) )
+plt.grid(which='both')
+plt.title('FFT of white and pink noise')
 plt.ylabel('Magnitude (dB)')
 plt.xlabel('Frequency (Hz)')
 

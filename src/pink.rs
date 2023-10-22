@@ -50,14 +50,13 @@ impl Pink{
         let index = self.get_noise_index() as usize;
         assert!( index < self.generators as usize );
 
-
-        self.pink = self.pink - self.white.value();
-        self.white.update();
-        self.pink = self.pink + self.white.value();
-        
         self.pink = self.pink - self.noise[index].value();
         self.noise[index].update();
         self.pink = self.pink + self.noise[index].value();
+
+        self.pink = self.pink - self.white.value();
+        self.white.update();
+        self.pink = self.pink + self.white.value(); 
 
         self.increment_counter();
 
