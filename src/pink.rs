@@ -50,14 +50,13 @@ impl Pink{
         let index = self.get_noise_index() as usize;
         assert!( index < self.generators as usize );
 
-        self.white.update();
+        self.pink = self.pink - self.noise[index].value();
         self.noise[index].update();
-
-        self.pink = self.pink - self.white.previous();
-        self.pink = self.pink + self.white.value();
-        
-        self.pink = self.pink - self.noise[index].previous();
         self.pink = self.pink + self.noise[index].value();
+
+        self.pink = self.pink - self.white.value();
+        self.white.update();
+        self.pink = self.pink + self.white.value(); 
 
         self.increment_counter();
 
@@ -78,11 +77,9 @@ mod tests {
         assert_eq!(p.pink, 0.0);
         assert_eq!(p.rollover,16384);
         assert_eq!(p.white.value(), 0.0);
-        assert_eq!(p.white.previous(), 0.0);
 
         for i in 0..Pink::GENERATORS{
             assert_eq!(p.noise[i as usize].value(), 0.0);
-            assert_eq!(p.noise[i as usize].previous(), 0.0);
         }
 
     }
@@ -95,14 +92,11 @@ mod tests {
         assert_eq!(p.pink, 0.0);
         assert_eq!(p.rollover,16384);
         assert_eq!(p.white.value(), 0.0);
-        assert_eq!(p.white.previous(), 0.0);
        
         p.update();
         assert_ne!(p.pink, 0.0);
         assert_ne!(p.white.value(), 0.0);
-        assert_eq!(p.white.previous(), 0.0);
         assert_ne!(p.noise[0].value(), 0.0);
-        assert_eq!(p.noise[0].previous(), 0.0);
     }
 
     #[test]
