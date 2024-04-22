@@ -1,0 +1,41 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run tests
+      run: cargo test --verbose --release
+    - name: Build (Windows x86)
+      run: cargo build --verbose --release
+    - name: Uploard Windows Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pinkrain (Windows x86)
+        path: target/release/pinkrain.exe
+
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install deps
+      run: sudo apt-get install libasound2-dev
+    - name: Build (Linux x86)
+      run: cargo build --verbose --release
+    - name: Run tests
+      run: cargo test --verbose --release
+    - name: Uploard Linux Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pinkrain (Linux x86)
+        path: target/release/pinkrain

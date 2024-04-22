@@ -2,6 +2,8 @@
 
 Real time pink noise generation with rain visualization.
 
+[![Rust](https://github.com/llwyd/pinkrain/actions/workflows/rust.yml/badge.svg)](https://github.com/llwyd/pinkrain/actions/workflows/rust.yml)
+
 ![pinkrain](assets/pinkrain.gif)
 
 
